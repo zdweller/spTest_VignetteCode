@@ -38,6 +38,9 @@ mydata <- cbind(my.coords[,1],my.coords[,2], tas)
 
 ###not included in vignette###
 hist(tas, freq = F, xlab = "Temperature, K", main = "Histogram of Temperature")
+z.tas <- (tas - mean(tas))/sd(tas)
+qqnorm(z.tas)
+abline(0,1)
 ###############################
 
 x.coord <- unique(my.coords[,1])
@@ -74,9 +77,15 @@ title(main = "Scatters of Temperature vs. Coordinates" , line = -1, outer = T)
 ###############################
 
 resid <- m1$resid
+
 ###not included in vignette###
 hist(resid)
+library(MASS)
+stres <- studres(m1)
+qqnorm(stres)
+abline(0,1)
 ###############################
+
 resid.mat <- matrix(resid, nrow = nx, ncol = ny, byrow = F)
 image.plot(x.coord, y.coord, resid.mat, xlab = "Easting", ylab = "Northing", 
 main = "Heat Map of Residuals")
@@ -144,13 +153,19 @@ resid <- m1$resid
 hist(resid, freq = F, main = "Histogram of Residuals")
 lines(density(resid), lwd = 2)
 
+###not included in vignette###
+stres <- studres(m1)
+qqnorm(stres)
+abline(0,1)
+###############################
+
 resid <- m1$residuals
 precip.resid <- cbind(CO.loc[which(!bad),][,1],CO.loc[which(!bad),][,2] , resid)
 geodat <- as.geodata(precip.resid)
 svar4 <- variog4(geodat)
 plot(svar4, legend = F)
 legend("bottomright", legend = c(expression(0*degree), expression(45*degree), expression(90*degree), expression(135*degree)), col = 1:4, lty = 1:4)
-title("Directional Sample Variograms")
+title("Directional Sample Semivariograms")
 
 ###not included in vignette ###
 install.packages("spatstat")
@@ -196,10 +211,28 @@ tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2,
 kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
 grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
 tr.guan$pvalue.chisq
+
 ###not included in vignette###
 #compare estimates of the semivariance to those
 #given by geoR
 tr.guan$gamma.hat
+plot(svar4, legend = F)
+abline(v = 0.75)
+
+#Check sensitivity to bandwidth parameters
+myh <-  0.4
+myh.sb <-  0.7
+tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
+kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
+grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
+tr.guan$pvalue.chisq
+
+myh <-  0.8
+myh.sb <-  0.9
+tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
+kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
+grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
+tr.guan$pvalue.chisq
 ###############################
 
 tr.maity <- MaityTest(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, 
