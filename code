@@ -17,18 +17,23 @@ library(splines)
 ###  gridded data example   ###
 ###############################
 
-data(WRFG)
-image.plot(WRFG$lon-360, WRFG$lat, WRFG$WRFG.NCEP.tas, xlab = "Longitude",
-ylab = "Latitude", main = "Mean WRFG-NCEP Temperatures")
+data("WRFG")
+image.plot(WRFG$lon-360, WRFG$lat, WRFG$WRFG.NCEP.tas, 
+col = two.colors(n = 256, start = "blue3", end = "red3", middle = "gray60"),
+legend.lab = "Temp (K)",legend.cex = 0.8,legend.line = 2.2,
+xlab = "Longitude", ylab = "Latitude", 
+main = "Mean WRFG-NCEP Temperatures")
 world(add = T)
 
 coords <- expand.grid(WRFG$xc,WRFG$yc)
 sub <- which(coords[,1] > 2.95e6 & coords[,1] < 4.0e6 
 & coords[,2] > 1.2e6 & coords[,2] < 2.25e6)
-image.plot(WRFG$xc, WRFG$yc, WRFG$WRFG.NCEP.tas, xlab = "Easting", 
-ylab = "Northing", main = "Map Projection Coordinates")
+image.plot(WRFG$xc, WRFG$yc, WRFG$WRFG.NCEP.tas, 
+col = two.colors(n = 256, start = "blue3", end = "red3", middle = "gray60"),
+legend.lab = "Temp (K)",legend.cex = 0.8,legend.line = 2.2,
+xlab = "Easting", ylab = "Northing", 
+main = "Map Projection Coordinates")
 points(coords[sub,], pch = 16, cex = 0.35)
-
 my.coords <- coords[sub,]
 colnames(my.coords) <- c("xc", "yc") 
 tas <- WRFG$WRFG.NCEP.tas
@@ -48,8 +53,11 @@ y.coord <- unique(my.coords[,2])
 nx <- length(x.coord)
 ny <- length(y.coord)
 tas.mat <- matrix(mydata[,3], nrow = nx, ncol = ny, byrow = F)
-image.plot(x.coord, y.coord, tas.mat, ylab = "Northing", xlab = "Easting",
-main = "Subset of WRFG Temperatures")
+image.plot(x.coord, y.coord, tas.mat, 
+col = two.colors(n = 256, start = "blue3", end = "red3", middle = "gray60"),
+legend.lab = "Temp (K)",legend.cex = 0.8,legend.line = 2.2,
+ylab = "Northing", xlab = "Easting",
+main = "Subset of Temperatures")
 
 geodat <- as.geodata(mydata)
 svar4 <- variog4(geodat)
@@ -57,12 +65,12 @@ plot(svar4)
 title("Directional Sample Semivariograms")
 
 my.delta <- 50000
-mylags <-  rbind(c(4,0), c(0, 4), c(3, 3), c(-3,3))
+mylags <-  rbind(c(1,0), c(0, 1), c(1, 1), c(-1,1))
 myA <-  rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
 tr <- GuanTestGrid(spdata = mydata, delta = my.delta, lagmat = mylags, A = myA,
- window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
+ window.dims = c(4,4),pt.est.edge = TRUE, sig.est.edge = TRUE, 
  sig.est.finite = TRUE, df = 2 )
-tr$pvalue.finite
+tr
 
 x1 <- c(my.coords[,1])
 x2 <- c(my.coords[,2])
@@ -87,8 +95,10 @@ abline(0,1)
 ###############################
 
 resid.mat <- matrix(resid, nrow = nx, ncol = ny, byrow = F)
-image.plot(x.coord, y.coord, resid.mat, xlab = "Easting", ylab = "Northing", 
-main = "Heat Map of Residuals")
+image.plot(x.coord, y.coord, resid.mat, 
+col = two.colors(n = 256, start = "blue3", end = "red3", middle = "gray60"),
+xlab = "Easting", ylab = "Northing")
+title("Heat Map of Residuals")
 
 resid.dat <- cbind(mydata[,1:2], resid)
 geodat.resid <- as.geodata(resid.dat)
@@ -98,7 +108,7 @@ title("Directional Sample Semivariograms")
 tr <- GuanTestGrid(spdata = resid.dat, delta = my.delta, lagmat = mylags, A = myA,
  window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
  sig.est.finite = TRUE, df = 2 )
-tr$pvalue.finite
+tr$p.value.finite
 ###############################
 ###############################
 
@@ -106,26 +116,28 @@ tr$pvalue.finite
 ###############################
 ### non-gridded data example###
 ###############################
-data(COmonthlyMet)
-dim(CO.ppt)
+data("COmonthlyMet")
 sub30 <- CO.ppt[74:103,,]
-dim(sub30)
 nstations <- 376
 years <- 1968:1997
 nyears <- length(years)
 yr.avg <- matrix(data = NA, nrow = nstations, ncol = nyears)
-for(i in 1:nyears)
-{
+for(i in 1:nyears){
 	yr.dat <- sub30[i,,]
 	yr.avg[,i] <- apply(yr.dat, 2 , mean, na.rm = T)
 }
 avg30 <- apply(yr.avg, 1, mean, na.rm = T)
-
-quilt.plot(CO.loc, log(avg30), xlab = "Longitude", ylab = "Latitude",
+quilt.plot(CO.loc, log(avg30), 
+col = two.colors(n = 256, start = "blue3", end = "red3", middle = "gray60"),
+legend.lab = "Precip (log mm)",legend.cex = 0.8,legend.line = 2.2,
+xlab = "Longitude", ylab = "Latitude",
 main = "Quilt Plot of log(precip)")
 US(add = T)
 
-quilt.plot(CO.loc, CO.elev, xlab = "Longitude", ylab = "Latitude",
+quilt.plot(CO.loc, CO.elev, 
+col = two.colors(n = 256, start = "blue3", end = "red3", middle = "gray60"),
+legend.lab = "Elevation (meters)",legend.cex = 0.8,legend.line = 2.7,
+xlab = "Longitude", ylab = "Latitude",
 main = "Quilt Plot of Elevation")
 US(add = T)
 
@@ -187,30 +199,32 @@ clarkevans.test(pp)
 mylags <- 0.75 * rbind(c(1,0), c(0,1), c(1,1), c(-1,1))
 myA <- rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
 
-quilt.plot(precip.resid[,1:2], precip.resid[,3], xlab = "Longitude", ylab = "Latitude")
+quilt.plot(precip.resid[,1:2], precip.resid[,3], 
+col = two.colors(n = 256, start = "blue3", end = "red3", middle = "gray60"),
+xlab = "Longitude", ylab = "Latitude")
 title("Quilt Plot of Residuals and Grid Used for Subsampling")
 min(precip.resid[,1])
 max(precip.resid[,1])
 min(precip.resid[,2])
 max(precip.resid[,2])
-#Set the limits of the sampling region to be slightly 
-#larger than the min/max coordinates
+# The limits of the sampling region should be 
+# slightly larger than the min/max coordinates.
 my.xlims <-  c(-109.5, -101)
 my.ylims <-  c(36.5, 41.5)
 xlen <-  my.xlims[2]-my.xlims[1]
 ylen <-  my.ylims[2]-my.ylims[1]
-my.grid.spacing <-  c(xlen/12, ylen/12)
+my.grid.spacing <-  c(xlen/16, ylen/12)
 xgrid <- seq(my.xlims[1], my.xlims[2], by = my.grid.spacing[1])
 ygrid <- seq(my.ylims[1], my.ylims[2], by = my.grid.spacing[2])
 abline(v = xgrid, lty = 2)
 abline(h = ygrid, lty = 2)
 
-myh <-  0.6
+myh <-  0.7
 myh.sb <-  0.7
 tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
 kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
 grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
-tr.guan$pvalue.chisq
+tr.guan$p.value
 
 ###not included in vignette###
 #compare estimates of the semivariance to those
@@ -220,15 +234,15 @@ plot(svar4, legend = F)
 abline(v = 0.75)
 
 #Check sensitivity to bandwidth parameters
-myh <-  0.4
-myh.sb <-  0.7
+myh <-  0.6
+myh.sb <-  0.6
 tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
 kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
 grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
 tr.guan$pvalue.chisq
 
 myh <-  0.8
-myh.sb <-  0.9
+myh.sb <-  0.8
 tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
 kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
 grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
@@ -238,14 +252,14 @@ tr.guan$pvalue.chisq
 tr.maity <- MaityTest(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, 
 xlims = my.xlims, ylims = my.ylims, grid.spacing = my.grid.spacing, 
 block.dims = c(4,3), nBoot = 100, kappa = 1)
-tr.maity$pvalue.chisq
+tr.maity$p.value
 
 ###not included in vignette###
 #check sensitivity to the number of bootstrap samples
 tr.maity <- MaityTest(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, 
 xlims = my.xlims, ylims = my.ylims, grid.spacing = my.grid.spacing, 
 block.dims = c(4,3), nBoot = 200, kappa = 1)
-tr.maity$pvalue.chisq
+tr.maity$p.value
 ###############################
 
 ###############################
